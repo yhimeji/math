@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算数チャレンジ（分数・小数・整数）</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f3f7ff;
+    color:#333;
+}
+
+header{
+    background:linear-gradient(135deg,#4facfe,#00c6ff);
+    color:white;
+    text-align:center;
+    padding:25px 15px;
+}
+
+header h1{
+    margin:0;
+    font-size:1.8rem;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:15px;
+}
+
+.question{
+    background:white;
+    margin-bottom:20px;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-top:0;
+    line-height:1.5;
+}
+
+.option{
+    width:100%;
+    margin:8px 0;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#eaf2ff;
+    font-size:1rem;
+    text-align:left;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#d5e6ff;
+}
+
+.option:disabled{
+    cursor:not-allowed;
+}
+
+.correct{
+    color:#0a8f3e;
+    font-weight:bold;
+    margin-top:12px;
+}
+
+.incorrect{
+    color:#d93025;
+    font-weight:bold;
+    margin-top:12px;
+}
+
+.finish-btn{
+    width:100%;
+    padding:16px;
+    font-size:1.1rem;
+    border:none;
+    border-radius:12px;
+    background:#4caf50;
+    color:white;
+    font-weight:bold;
+    margin-bottom:30px;
+}
+
+.finish-btn:disabled{
+    background:#999;
+}
+
+#resultPage{
+    display:none;
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    margin-bottom:40px;
+    text-align:center;
+    box-shadow:0 3px 12px rgba(0,0,0,0.12);
+}
+
+.score{
+    font-size:56px;
+    color:#2196f3;
+    font-weight:bold;
+}
+
+.message{
+    font-size:28px;
+    margin-top:15px;
+}
+
+.note{
+    margin-top:25px;
+    font-size:14px;
+    color:#666;
+}
+
+.retry-btn{
+    padding:14px 24px;
+    font-size:16px;
+    border:none;
+    border-radius:10px;
+    background:#ff9800;
+    color:white;
+    margin-top:20px;
+    cursor:pointer;
+}
+
+.footer{
+    text-align:center;
+    color:#888;
+    margin:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎯 算数チャレンジ</h1>
+    <p>分数・小数・整数の関係（全10問）</p>
+</header>
+
+<div class="container">
+    <div id="quizContainer"></div>
+
+    <button id="finishButton" class="finish-btn" disabled>
+        結果を見る
+    </button>
+
+    <div id="resultPage">
+        <h2>結果発表</h2>
+
+        <div class="score" id="score"></div>
+
+        <div class="message" id="message"></div>
+
+        <p id="detail"></p>
+
+        <div class="note">
+            📸 この結果画面をスクリーンショットに保存して、おうちの人に見せよう！
+        </div>
+
+        <button class="retry-btn" onclick="location.reload()">
+            もう一度挑戦する
+        </button>
+    </div>
+</div>
+
+<div class="footer">
+    がんばって満点を目指そう！
+</div>
+
+<script>
+
+const questions = [
+
+{
+q:"① 3/4 を小数で表すとどれですか？",
+choices:["0.25","0.5","0.75","1.25"],
+answer:2
+},
+
+{
+q:"② 0.6 を分数で表すとどれですか？",
+choices:["3/5","6/5","1/6","5/3"],
+answer:0
+},
+
+{
+q:"③ 5 を分数で表すとどれですか？",
+choices:["5/5","10/5","5/1","1/5"],
+answer:2
+},
+
+{
+q:"④ 0.25 と同じ大きさの分数はどれですか？",
+choices:["1/2","1/4","3/4","2/5"],
+answer:1
+},
+
+{
+q:"⑤ 次のうち一番大きい数はどれですか？",
+choices:["0.8","3/4","7/10","2/3"],
+answer:0
+},
+
+{
+q:"⑥ 1/2、0.4、3/5 を小さい順に並べると正しいのはどれですか？",
+choices:[
+"1/2 → 0.4 → 3/5",
+"0.4 → 1/2 → 3/5",
+"3/5 → 1/2 → 0.4",
+"0.4 → 3/5 → 1/2"
+],
+answer:1
+},
+
+{
+q:"⑦ 7/10 を小数で表すとどれですか？",
+choices:["0.07","0.7","7.0","70"],
+answer:1
+},
+
+{
+q:"⑧ 0.125 と同じ分数はどれですか？",
+choices:["1/2","1/4","1/8","1/10"],
+answer:2
+},
+
+{
+q:"⑨ 次のうち 1 と同じ大きさの数はどれですか？",
+choices:["10/100","5/10","100/100","1/10"],
+answer:2
+},
+
+{
+q:"⑩ 0.75、3/4、75/100 の関係として正しいものはどれですか？",
+choices:[
+"すべて同じ大きさ",
+"0.75だけ大きい",
+"3/4だけ大きい",
+"75/100だけ大きい"
+],
+answer:0
+}
+
+];
+
+let score = 0;
+let answered = 0;
+
+const quizContainer =
+document.getElementById("quizContainer");
+
+questions.forEach((q,index)=>{
+
+const div = document.createElement("div");
+div.className = "question";
+
+let html = `<h3>${q.q}</h3>`;
+
+q.choices.forEach((choice,i)=>{
+html += `
+<button class="option"
+onclick="checkAnswer(${index},${i},this)">
+${choice}
+</button>`;
+});
+
+html += `<div id="result-${index}"></div>`;
+
+div.innerHTML = html;
+quizContainer.appendChild(div);
+
+});
+
+function checkAnswer(questionIndex,choiceIndex,button){
+
+const result =
+document.getElementById(`result-${questionIndex}`);
+
+if(result.innerHTML !== ""){
+return;
+}
+
+const question = questions[questionIndex];
+
+button.parentElement
+.querySelectorAll(".option")
+.forEach(btn=>btn.disabled=true);
+
+if(choiceIndex === question.answer){
+
+score += 10;
+
+result.innerHTML =
+'<div class="correct">⭕ 正解！ よくできました！</div>';
+
+}else{
+
+result.innerHTML =
+`<div class="incorrect">
+❌ 不正解！<br>
+正解は「${question.choices[question.answer]}」です。
+</div>`;
+}
+
+answered++;
+
+if(answered === questions.length){
+document.getElementById("finishButton").disabled=false;
+}
+
+}
+
+document.getElementById("finishButton")
+.addEventListener("click",showResult);
+
+function showResult(){
+
+let msg="";
+
+if(score < 60){
+msg="不合格";
+}
+else if(score === 60){
+msg="合格";
+}
+else if(score === 70){
+msg="まぁまぁ";
+}
+else if(score === 80){
+msg="よくできました";
+}
+else if(score === 90){
+msg="素晴らしい";
+}
+else if(score === 100){
+msg="パーフェクト！";
+}
+
+document.getElementById("score").innerText =
+score + "点";
+
+document.getElementById("message").innerText =
+msg;
+
+document.getElementById("detail").innerText =
+`${score/10}問 / 10問 正解`;
+
+document.getElementById("resultPage").style.display =
+"block";
+
+document.getElementById("resultPage")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+</script>
+
+</body>
+</html>
